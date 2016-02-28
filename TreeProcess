@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void crearHijos(int hijos, int nivel);
+int n;
+
+int main(){
+	printf("╔═════════════════════════════════════════╗\n");
+	printf("║  Sistemas Operativos - 2CM2 - Feb/2016  ║\n");
+	printf("║      Practica: 'Arbol de procesos'      ║\n");
+	printf("╚═════════════════════════════════════════╝\n");
+	printf("¿Cuantos niveles desea que tenga el arbol?\n");
+	scanf("%d", &n);
+	crearHijos(2, 1);
+	
+	return 0;
+}
+
+void crearHijos(int hijos, int nivel){
+	int status, i;
+	
+	if(nivel <= n){
+		// Crear hijos.
+		for(i  = 0; i < hijos; i++){
+			switch(fork()){	// 
+				case -1:
+					perror("ERROR: No se pudo crear el hijo.\n");
+					break;
+				case 0:
+				    printf("Nivel: %d. Soy el proceso %d mi padre es %d\n", nivel, getpid(), getppid());
+				    
+				    // Checar cuantos hijos crear.
+				    if(nivel == 1)
+    				    if(i == 0){ // Arbol binario.
+        					crearHijos(2, 2);
+        				} else{ // Arbol ternario.
+        				    crearHijos(3, 2);
+        				}
+					else
+					    crearHijos(hijos, ++nivel);
+					    
+					exit(0);
+					break;
+				default:
+					printf("Padre %d\n", getpid());
+			}
+		}
+		while(wait(&status) != -1){	/* Espera a los procesos hijo. */ }
+	}
+}
